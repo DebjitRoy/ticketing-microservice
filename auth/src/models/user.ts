@@ -19,10 +19,23 @@ interface IUserModel extends Model<IUser> {
 }
 
 // 4. Create the User schema
-const userSchema = new Schema<IUser>({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-});
+const userSchema = new Schema<IUser>(
+  {
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+  },
+  {
+    toJSON: {
+      transform(doc, ret) {
+        // transforms returned JSON
+        delete ret.password;
+        delete ret.__v;
+        delete ret._id;
+        ret.id = doc._id;
+      },
+    },
+  }
+);
 
 // middleware hooks
 // arrow function can't be used due to 'this'

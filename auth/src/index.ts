@@ -2,6 +2,7 @@ import express from "express";
 import "express-async-errors"; // allows to throw inside async
 import { json } from "body-parser";
 import mongoose from "mongoose";
+import cookieSession from "cookie-session";
 
 import { currentUserRouter } from "./routes/current-user";
 import { signInRouter } from "./routes/signin";
@@ -11,7 +12,14 @@ import { errorHandler } from "./middlewares/error-handler";
 import { NotFoundError } from "./errors/not-found-error";
 
 const app = express();
+app.set("trust proxy", true); // express is behind nginx, so allows https over proxy
 app.use(json());
+app.use(
+  cookieSession({
+    signed: false,
+    secure: true,
+  })
+);
 
 app.use(currentUserRouter);
 app.use(signInRouter);
@@ -27,6 +35,9 @@ app.all("*", async () => {
 app.use(errorHandler); // generic error handler mw
 
 const start = async () => {
+  if (!process.env.JWT_KEY) {
+    throw new Error("JWT key must be defined!");
+  }
   try {
     // mongo db cluster ip service name
     await mongoose.connect("mongodb://auth-mongo-srv:27017/auth");
