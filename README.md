@@ -15,5 +15,6 @@ from browser, hit this URL to launch app(in local)
 > run `skaffold delete`
 
 > JWT secret in kubectl - jwt-secret > JWT_KEY
-> set screts -> k create secret generic jwt-secret --from-literal=JWT_KEY=asdf
+> set screts ->
+> k create secret generic jwt-secret --from-literal=JWT_KEY=asdf
 > k get secrets
