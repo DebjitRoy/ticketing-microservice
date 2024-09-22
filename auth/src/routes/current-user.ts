@@ -1,18 +1,15 @@
 import express from "express";
-import jwt from "jsonwebtoken";
+import { currentUser } from "../middlewares/current-user";
+import { requireAuth } from "../middlewares/require-auth";
 
 const router = express.Router();
 
-router.get("/api/users/currentuser", (req, res) => {
-  if (!req.session?.jwt) {
-    return res.send({ currentUser: null });
-  }
-  try {
-    const payload = jwt.verify(req.session.jwt, process.env.JWT_KEY!);
-    res.send({ currentUser: payload });
-  } catch (e) {
-    res.send({ currentUser: null });
-  }
+// use middleware to get currentUser data from session
+// requireAuth MW can only execute after currentUser MW
+// If requireAuth MW is added, unless the user has signed in, we throw error
+// router.get("/api/users/currentuser", currentUser, requireAuth, (req, res) => {
+router.get("/api/users/currentuser", currentUser, (req, res) => {
+  res.send({ currentUser: req.currentUser || null });
 });
 
 export { router as currentUserRouter };
